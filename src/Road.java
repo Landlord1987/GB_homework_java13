@@ -1,3 +1,5 @@
+import java.util.concurrent.Semaphore;
+
 public class Road extends Stage {
     public Road(int length) {
         this.length = length;
@@ -5,7 +7,7 @@ public class Road extends Stage {
     }
 
     @Override
-    public void go(Car c) {
+    public void go(Car c, Semaphore semaphore) {
         try {
             System.out.println(c.getName() + " начал этап: " + description);
             Thread.sleep(length / c.getSpeed() * 1000);

@@ -1,3 +1,5 @@
+import java.util.concurrent.Semaphore;
+
 public class Tunnel extends Stage {
     public Tunnel() {
         this.length = 80;
@@ -5,9 +7,10 @@ public class Tunnel extends Stage {
     }
 
     @Override
-    public void go(Car c) {
+    public void go(Car c, Semaphore semaphore) {
         try {
             try {
+                semaphore.acquire();
                 System.out.println(c.getName() + " готовится к этапу(ждет): " +
                         description);
                 System.out.println(c.getName() + " начал этап: " + description);
@@ -17,6 +20,7 @@ public class Tunnel extends Stage {
             } finally {
                 System.out.println(c.getName() + " закончил этап: " +
                         description);
+                semaphore.release();
             }
         } catch (Exception e) {
             e.printStackTrace();

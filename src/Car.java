@@ -1,8 +1,12 @@
+import java.util.concurrent.Semaphore;
+
 public class Car implements Runnable {
     private static int CARS_COUNT;
     private Race race;
     private int speed;
     private String name;
+    private Semaphore semaphore;
+    private Semaphore semaphore1;
 
     public String getName() {
         return name;
@@ -12,24 +16,34 @@ public class Car implements Runnable {
         return speed;
     }
 
-    public Car(Race race, int speed) {
+    public Car(Race race, int speed, Semaphore semaphore, Semaphore semaphor1) {
         this.race = race;
         this.speed = speed;
+        this.semaphore = semaphore;
+        this.semaphore1 = semaphor1;
         CARS_COUNT++;
         this.name = "Участник #" + CARS_COUNT;
     }
 
     @Override
     public void run() {
-        try {
-            System.out.println(this.name + " готовится");
-            Thread.sleep(500 + (int) (Math.random() * 800));
-            System.out.println(this.name + " готов");
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+
         for (int i = 0; i < race.getStages().size(); i++) {
-            race.getStages().get(i).go(this);
+
+            race.getStages().get(i).go(this, semaphore);
+
+        }
+        // Ловим победителя и остальных финишеров
+        if (semaphore1.availablePermits() == 4) {
+            try {
+                semaphore1.acquire();
+            } catch (InterruptedException e) {
+                throw new RuntimeException(e);
+            }
+            System.out.println("Пришел первым: " + name);
+        }
+        else {
+            System.out.println("Финишировал: " + name);
         }
     }
 }
